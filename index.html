@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mathias Twisttmann Pedersen</title>
+<meta name="description" content="Computer science MSc student at the University of Southern Denmark, building grounded medical AI at Tarmforeningen. Machine learning and bioinformatics.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: fixed identity rail on the left, one reading column on the right; stacks on phones. */
+:root {
+  --bg: #f2f4f6;
+  --surface: #ffffff;
+  --ink: #13202b;
+  --muted: #566572;
+  --line: #d5dbe1;
+  --accent: #1d4ed8;
+  --agent: #d97706;
+  --font-display: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1318; --surface: #151d24; --ink: #e4eaef; --muted: #93a2ae;
+    --line: #26323c; --accent: #86a8ff; --agent: #f5a524;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1318; --surface: #151d24; --ink: #e4eaef; --muted: #93a2ae;
+  --line: #26323c; --accent: #86a8ff; --agent: #f5a524;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
+p { margin: 0; }
+ul { margin: 0; padding: 0; list-style: none; }
+
+.page {
+  max-width: 1120px; margin: 0 auto; padding: 0 24px;
+  display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 72px;
+}
+
+/* ---------- Rail ---------- */
+.rail {
+  position: sticky; top: 0; align-self: start; height: 100vh;
+  padding: 48px 0 24px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto;
+}
+@media (min-width: 901px) { main { padding-top: 48px; } }
+.rail h1 { font-size: 2.1rem; line-height: 1.05; font-weight: 700; letter-spacing: -0.02em; }
+.id { display: flex; flex-direction: column; gap: 16px; }
+.photo { width: 88px; height: 88px; border-radius: 50%; object-fit: cover; border: 1px solid var(--line); display: block; }
+.role { color: var(--muted); font-size: 0.98rem; }
+.rail nav ul { display: flex; flex-direction: column; gap: 6px; }
+.rail nav a {
+  font-family: var(--font-mono); font-size: 0.82rem; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--muted); text-decoration: none; display: inline-block; padding: 3px 0;
+}
+.rail nav a:hover, .rail nav a[aria-current="true"] { color: var(--ink); }
+.rail nav a[aria-current="true"] { text-decoration: underline; text-underline-offset: 5px; }
+.links { margin-top: auto; display: flex; flex-direction: column; gap: 6px; font-size: 0.92rem; }
+.links span { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; width: 74px; }
+
+/* ---------- Gridworld ---------- */
+.world { display: flex; flex-direction: column; gap: 8px; }
+.world canvas { width: 100%; max-width: 290px; height: auto; display: block; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+.world figcaption { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); line-height: 1.5; }
+figure { margin: 0; }
+
+/* ---------- Main ---------- */
+main { padding: 56px 0 96px; display: flex; flex-direction: column; gap: 80px; max-width: 700px; }
+section { scroll-margin-top: 32px; display: flex; flex-direction: column; gap: 24px; }
+.label {
+  font-family: var(--font-mono); font-size: 0.78rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--muted); padding-bottom: 10px; border-bottom: 1px solid var(--line);
+}
+.lede { font-family: var(--font-display); font-weight: 500; font-size: 1.65rem; line-height: 1.3; letter-spacing: -0.01em; }
+.prose { display: flex; flex-direction: column; gap: 14px; }
+.tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.tags li { font-family: var(--font-mono); font-size: 0.78rem; padding: 3px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); }
+
+/* Papers */
+.paper { display: flex; flex-direction: column; gap: 14px; }
+.paper + .paper { padding-top: 32px; border-top: 1px solid var(--line); }
+.paper h3 { font-size: 1.3rem; line-height: 1.2; font-weight: 700; letter-spacing: -0.01em; }
+.meta { font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); }
+.authors { font-size: 0.95rem; color: var(--muted); }
+.authors b { color: var(--ink); font-weight: 600; }
+.findings { display: flex; flex-direction: column; gap: 8px; }
+.findings li { padding-left: 18px; position: relative; }
+.findings li::before { content: ""; position: absolute; left: 0; top: 0.72em; width: 8px; height: 1px; background: var(--accent); }
+
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
+.stat b { display: block; font-family: var(--font-display); font-size: 1.7rem; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.stat small { font-size: 0.85rem; color: var(--muted); line-height: 1.4; display: block; margin-top: 4px; }
+
+.bars { display: flex; flex-direction: column; gap: 10px; padding-top: 16px; border-top: 1px solid var(--line); }
+.bars-title { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); }
+.bar { display: grid; grid-template-columns: 150px 1fr 52px; gap: 12px; align-items: center; font-size: 0.88rem; }
+.bar .track { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
+.bar .fill { height: 100%; background: var(--accent); border-radius: 4px; }
+.bar .val { font-family: var(--font-mono); font-size: 0.8rem; text-align: right; font-variant-numeric: tabular-nums; }
+.bar.base .fill { background: var(--muted); }
+
+/* Projects, timeline */
+.entries { display: flex; flex-direction: column; }
+.entry { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 24px; padding: 22px 0; border-bottom: 1px solid var(--line); }
+.entry:first-child { padding-top: 0; }
+.entry:last-child { border-bottom: 0; padding-bottom: 0; }
+.when { font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); padding-top: 5px; }
+.body { display: flex; flex-direction: column; gap: 8px; }
+.body h3 { font-size: 1.15rem; font-weight: 700; }
+.sub { color: var(--muted); font-size: 0.93rem; }
+
+.skills { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 14px 24px; }
+.skills dt { font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); padding-top: 4px; }
+.skills dd { margin: 0; }
+
+.contact { display: flex; flex-direction: column; gap: 6px; font-size: 1.05rem; }
+footer { color: var(--muted); font-size: 0.82rem; font-family: var(--font-mono); }
+
+@media (max-width: 900px) {
+  .page { grid-template-columns: 1fr; gap: 0; padding: 0 20px; }
+  .rail { position: static; height: auto; padding: 40px 0 0; gap: 20px; }
+  .rail nav ul { flex-direction: row; flex-wrap: wrap; gap: 4px 18px; }
+  .links { margin-top: 0; }
+  .world canvas { max-width: 340px; }
+  main { padding-top: 48px; gap: 64px; }
+}
+@media (max-width: 520px) {
+  .entry, .skills { grid-template-columns: 1fr; gap: 6px; }
+  .skills dd { margin-bottom: 10px; }
+  .bar { grid-template-columns: 104px 1fr 48px; gap: 8px; font-size: 0.8rem; }
+  .lede { font-size: 1.35rem; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="rail">
+    <div class="id">
+      <img class="photo" src="data:image/jpeg;base64,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" width="88" height="88" alt="Portrait of Mathias Twisttmann Pedersen">
+      <h1>Mathias Twisttmann Pedersen</h1>
+    </div>
+    <p class="role">MSc student in Computer Science at the University of Southern Denmark. AI developer at Tarmforeningen.</p>
+
+    <nav aria-label="Sections">
+      <ul>
+        <li><a href="#about">About</a></li>
+        <li><a href="#research">Research</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#education">Experience</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <figure class="world">
+      <canvas id="grid" width="580" height="364" role="img" aria-label="A small gridworld where an agent learns a path to the goal with Q-learning"></canvas>
+      <figcaption>A small Q-learning agent, learning as you watch. Darker cells have higher Q-values. <span id="ep">Episode 0</span></figcaption>
+    </figure>
+
+    <ul class="links">
+      <li><span>GitHub</span><a href="https://github.com/TwisteRmtps">TwisteRmtps</a></li>
+      <li><span>LinkedIn</span><a href="https://www.linkedin.com/in/mathias-twisttmann-pedersen-731648278/">Mathias T. Pedersen</a></li>
+    </ul>
+  </header>
+
+  <main>
+
+    <section id="about">
+      <p class="lede">I have a strong interest in bioinformatics and artificial intelligence, and I like working where data, technology and problem-solving meet.</p>
+      <div class="prose">
+        <p>I finished my BSc in Computer Science at the University of Southern Denmark in 2026 and started my MSc the same autumn. I plan to focus on bioinformatics. My bachelor project was about fine-tuning a small language model to call tools in Danish, and I also wrote a course-project paper with two classmates on using GRPO for continuous control.</p>
+        <p>Since July 2026 I have worked part-time as an AI developer at Tarmforeningen, where I am building a chatbot for people with intestinal diseases.</p>
+        <p>I thrive in team-based environments and believe the best solutions emerge through collaboration, knowledge sharing and shared responsibility. I am eager to learn, and committed to turning complex knowledge into practical solutions.</p>
+        <p class="sub">Interests: bioinformatics, machine learning, reinforcement learning, deep learning, optimization and control, cybersecurity.</p>
+      </div>
+    </section>
+
+    <section id="research">
+      <h2 class="label">Research</h2>
+
+      <article class="paper">
+        <p class="meta">Course project paper · IMADA, University of Southern Denmark</p>
+        <h3>GRPO for Control</h3>
+        <p class="authors">Asbjørn Vesterskov Olsen, Lucas Bergholdt Hansen, <b>Mathias Twisttmann Pedersen</b></p>
+        <p>GRPO trains language models without a learned critic by comparing samples within a group. We wanted to see if the same idea works for continuous control, where there is no obvious group to compare against. We ended up with VC-GPG, which mixes the group-relative advantage with an ordinary GAE estimate from a critic.</p>
+        <ul class="findings">
+          <li>Tested against PPO, SAC and TD3 on CarRacing, cartpole swing-up and acrobot swing-up, with five seeds each.</li>
+          <li>About as good as PPO or slightly better. On CarRacing it ended at 530 against PPO's 458.</li>
+          <li>Clearly behind SAC and TD3 for the same number of training steps.</li>
+        </ul>
+      </article>
+
+      <article class="paper">
+        <p class="meta">Bachelor thesis · Spring 2026 · Supervisor: Peter Schneider Kamp</p>
+        <h3>LLM Evaluation &amp; Agentic Post-Training for Tool-Oriented Tasks</h3>
+        <p class="authors">Asbjørn Vesterskov Olsen, <b>Mathias Twisttmann Pedersen</b></p>
+        <p>We tried to teach Gemma 3 270M, a very small open model, to call tools in Danish. We generated the training data synthetically and fine-tuned on it.</p>
+        <ul class="findings">
+          <li>More data did not help on its own. A smaller, curated and balanced dataset did.</li>
+          <li>The biggest jump came from a training fix: sample packing had turned off completion-only loss.</li>
+          <li>Single-tool calls work well. No-tool and multi-tool cases only partly.</li>
+          <li>The model scored about the same on an English validation set.</li>
+        </ul>
+        <div class="bars">
+          <p class="bars-title">Danish validation set, 102 examples</p>
+          <div class="bar base"><span>Base model, exact match</span><div class="track"><div class="fill" style="width:1.9%"></div></div><span class="val">1.9%</span></div>
+          <div class="bar"><span>Final, exact match</span><div class="track"><div class="fill" style="width:76.4%"></div></div><span class="val">76.4%</span></div>
+          <div class="bar"><span>Final, arguments</span><div class="track"><div class="fill" style="width:77.4%"></div></div><span class="val">77.4%</span></div>
+          <div class="bar"><span>Final, function</span><div class="track"><div class="fill" style="width:93.1%"></div></div><span class="val">93.1%</span></div>
+          <div class="bar"><span>Final, initiation</span><div class="track"><div class="fill" style="width:99%"></div></div><span class="val">99.0%</span></div>
+        </div>
+        <p><a href="https://huggingface.co/datasets/schneiderkamplab/danish-tool-calling-benchmark">Danish Tool Calling Benchmark on Hugging Face</a></p>
+      </article>
+    </section>
+    
+    <section id="education">
+      <h2 class="label">Experience and education</h2>
+      <div class="entries">
+        <div class="entry">
+          <p class="when">Jul 2026 – now</p>
+          <div class="body">
+            <h3>AI Developer, Tarmforeningen</h3>
+            <p class="sub">Student assistant, part-time</p>
+            <p>I'm building a retrieval-based chatbot that answers questions from people living with intestinal diseases, such as Crohn's disease, celiac disease, IBS and many others. The primary challenge is to ensure the answers are grounded in peer-reviewed medical literature rather than the misinformation patients find on social media. I'm also building the backend API that serves the chatbot to a mobile app.</p>
+            <p class="sub">Stack: Python, OpenAI API, LlamaIndex, DeepEval, ChromaDB, FastAPI</p>
+          </div>
+        </div>
+        <div class="entry">
+          <p class="when">2026 – 2028</p>
+          <div class="body">
+            <h3>MSc in Computer Science, University of Southern Denmark</h3>
+            <p class="sub">Odense</p>
+            <p>Planned focus: bioinformatics.</p>
+            <p>Current courses: Mining Massive Data Sets (DM8106), Advanced Topics in Artificial Intelligence, Cybersecurity, and Programming Languages (DM8110), Frontiers of Algorithms (DM8111) and Spatial Data Management (DM888).</p>
+          </div>
+        </div>
+        <div class="entry">
+          <p class="when">2023 – 2026</p>
+          <div class="body">
+            <h3>BSc in Computer Science, University of Southern Denmark</h3>
+            <p class="sub">Odense</p>
+            <p>Courses included Reinforcement Learning, Machine Learning, Data Mining, Concurrent Programming, Operating Systems, Databases, Advanced Algorithms and Software Engineering.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <section id="projects">
+      <h2 class="label">Projects</h2>
+      <div class="entries">
+        <div class="entry">
+          <p class="when">Jan – Apr 2026</p>
+          <div class="body">
+            <h3>Profiling Overestimation Bias in Ensemble Q-Learning</h3>
+            <p class="sub">Reinforcement Learning, semester project · Python, NumPy</p>
+            <p>I built three gridworlds, each designed to cause a different kind of overestimation (structural, systematic and stochastic hazards). Then I implemented Double Q-learning, DQN-min, QEnsemble-Min and REDQ from scratch and compared how much each one overestimates.</p>
+          </div>
+        </div>
+        <div class="entry">
+          <p class="when">Sep 2025 – Jan 2026</p>
+          <div class="body">
+            <h3>VVPL Interpreter</h3>
+            <p class="sub">Compiler Construction, semester project</p>
+            <p>An interpreter for a small custom language: scanner, recursive-descent parser, AST, semantic analysis and execution, with error recovery. Written in pairs, with 88% test coverage.</p>
+          </div>
+        </div>
+        <div class="entry">
+          <p class="when">Mar – May 2025</p>
+          <div class="body">
+            <h3>FUSE Filesystem</h3>
+            <p class="sub">Operating Systems, semester project · C, FUSE</p>
+            <p>An in-memory file system in C using FUSE. It supports ls, cat, mkdir, rm and echo, saves its state to disk between sessions, and encrypts file contents with a Caesar cipher.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section id="skills">
+      <h2 class="label">Skills</h2>
+      <dl class="skills">
+        <dt>Languages</dt><dd>Python, Java, TypeScript, C, R, HTML, CSS</dd>
+        <dt>Tools</dt><dd>NumPy, FastAPI, LlamaIndex, ChromaDB, DeepEval, OpenAI API, PostgreSQL, Git, FUSE, Linux, UCloud</dd>
+        <dt>Spoken</dt><dd>Danish (native), English (C2), German and Norwegian (reading)</dd>
+      </dl>
+    </section>
+
+    <section id="contact">
+      <h2 class="label">Contact</h2>
+      <p>Email is the best way to reach me, find it through LinkedIn</p>
+      <ul class="contact">
+        <li><a href="https://www.linkedin.com/in/mathias-twisttmann-pedersen-731648278/">LinkedIn</a></li>
+        <li><a href="https://github.com/TwisteRmtps">github.com/TwisteRmtps</a></li>
+      </ul>
+      <footer>Odense, Denmark</footer>
+    </section>
+
+  </main>
+</div>
+
+<script>
+/* Gridworld: tabular Q-learning with epsilon-greedy exploration. */
+(function () {
+  var cv = document.getElementById('grid'), cx = cv.getContext('2d'), epEl = document.getElementById('ep');
+  var W = 8, H = 5, S = cv.width / W, PAD = (cv.height - H * S) / 2;
+  var walls = { '2,1': 1, '2,2': 1, '2,3': 1, '5,1': 1, '5,2': 1, '5,4': 1, '4,2': 1 };
+  var hazard = { '6,3': 1, '3,4': 1 };
+  var start = [0, 4], goal = [7, 0];
+  var moves = [[0, -1], [1, 0], [0, 1], [-1, 0]];
+  var Q = [], i;
+  for (i = 0; i < W * H; i++) Q.push([0, 0, 0, 0]);
+  var pos = start.slice(), episode = 0, steps = 0, trail = [];
+  var alpha = 0.3, gamma = 0.95;
+
+  function idx(p) { return p[1] * W + p[0]; }
+  function maxQ(s) { return Math.max.apply(null, Q[s]); }
+  function eps() { return Math.max(0.05, 0.6 * Math.pow(0.97, episode)); }
+
+  function step() {
+    var s = idx(pos), a;
+    if (Math.random() < eps()) a = Math.floor(Math.random() * 4);
+    else { var best = maxQ(s), opts = []; for (var k = 0; k < 4; k++) if (Q[s][k] === best) opts.push(k); a = opts[Math.floor(Math.random() * opts.length)]; }
+    var nx = pos[0] + moves[a][0], ny = pos[1] + moves[a][1];
+    if (nx < 0 || ny < 0 || nx >= W || ny >= H || walls[nx + ',' + ny]) { nx = pos[0]; ny = pos[1]; }
+    var r = -0.02, done = false;
+    if (nx === goal[0] && ny === goal[1]) { r = 1; done = true; }
+    else if (hazard[nx + ',' + ny]) { r = -1; done = true; }
+    var s2 = ny * W + nx;
+    Q[s][a] += alpha * (r + (done ? 0 : gamma * maxQ(s2)) - Q[s][a]);
+    pos = [nx, ny]; trail.push(pos.slice()); if (trail.length > 14) trail.shift();
+    steps++;
+    if (done || steps > 80) { episode++; steps = 0; pos = start.slice(); trail = []; return true; }
+    return false;
+  }
+
+  function tok(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+  function cell(x, y, inset) { return [x * S + inset, PAD + y * S + inset, S - 2 * inset, S - 2 * inset]; }
+
+  function draw() {
+    var accent = tok('--accent'), line = tok('--line'), muted = tok('--muted'), agent = tok('--agent'), bg = tok('--bg');
+    cx.clearRect(0, 0, cv.width, cv.height);
+    for (var y = 0; y < H; y++) for (var x = 0; x < W; x++) {
+      var k = x + ',' + y, c = cell(x, y, 3);
+      if (walls[k]) { cx.fillStyle = line; cx.fillRect(c[0], c[1], c[2], c[3]); continue; }
+      cx.fillStyle = bg; cx.fillRect(c[0], c[1], c[2], c[3]);
+      var v = Math.max(0, Math.min(1, maxQ(y * W + x)));
+      if (x === goal[0] && y === goal[1]) v = 1;
+      if (v > 0.01) { cx.globalAlpha = 0.12 + 0.7 * v; cx.fillStyle = accent; cx.fillRect(c[0], c[1], c[2], c[3]); cx.globalAlpha = 1; }
+      if (hazard[k]) {
+        cx.strokeStyle = muted; cx.lineWidth = 3; cx.beginPath();
+        cx.moveTo(c[0] + 20, c[1] + 20); cx.lineTo(c[0] + c[2] - 20, c[1] + c[3] - 20);
+        cx.moveTo(c[0] + c[2] - 20, c[1] + 20); cx.lineTo(c[0] + 20, c[1] + c[3] - 20); cx.stroke();
+      }
+    }
+    for (var t = 0; t < trail.length - 1; t++) {
+      cx.globalAlpha = 0.5 * (t + 1) / trail.length; cx.fillStyle = agent; cx.beginPath();
+      cx.arc(trail[t][0] * S + S / 2, PAD + trail[t][1] * S + S / 2, 6, 0, 6.3); cx.fill();
+    }
+    cx.globalAlpha = 1; cx.fillStyle = agent; cx.beginPath();
+    cx.arc(pos[0] * S + S / 2, PAD + pos[1] * S + S / 2, 15, 0, 6.3); cx.fill();
+    epEl.textContent = 'Episode ' + episode;
+  }
+
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce) {
+    while (episode < 300) step();
+    pos = start.slice(); trail = []; draw();
+    new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return;
+  }
+  /* Start with some learning already visible, then continue live. */
+  while (episode < 12) step();
+  var last = 0;
+  function loop(ts) {
+    if (ts - last > 70) { last = ts; step(); draw(); }
+    requestAnimationFrame(loop);
+  }
+  draw(); requestAnimationFrame(loop);
+})();
+
+/* Highlight the section in view. */
+(function () {
+  var links = [].slice.call(document.querySelectorAll('.rail nav a'));
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      links.forEach(function (l) { l.setAttribute('aria-current', l.getAttribute('href') === '#' + e.target.id ? 'true' : 'false'); });
+    });
+  }, { rootMargin: '-20% 0px -65% 0px' });
+  [].forEach.call(document.querySelectorAll('main section'), function (s) { io.observe(s); });
+})();
+</script>
+</body>
+</html>
